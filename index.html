@@ -5,7 +5,6 @@
   <title>نفذ الشروط</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* نفس تنسيقاتك الأصلية بالضبط دون أي تغيير */
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -137,7 +136,11 @@
       opacity: 1;
       box-shadow: 0 0 15px #0f0;
     }
+    .final-buttons a.btn-guide {
+      background-color: #06c !important;
+    }
     .final-buttons a:hover { transform: scale(1.03); }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
@@ -157,14 +160,14 @@
 </div>
 
 <div id="step1" class="step active">
-  <a href="#" onclick="completeStep(1, 'https://www.youtube.com/@DarkPanda-DP'); return false;">
+  <a href="#" onclick="completeStep(1, 'https://www.youtube.com/@MRGAMESFF-k3q'); return false;">
     <span>📺🔔 اضغط هنا وقم بالاشتراك في القناة 1 وتفعيل زر الجرس</span>
     <span id="check1">➡️</span>
   </a>
 </div>
 
 <div id="step2" class="step">
-  <a href="#" onclick="completeStep(2, 'https://www.youtube.com/@MRGAMESFF-k3q'); return false;">
+  <a href="#" onclick="completeStep(2, 'https://www.youtube.com/@DarkPanda-DP'); return false;">
     <span>📺🔔 اضغط هنا وقم بالاشتراك في القناة 2 وتفعيل زر الجرس</span>
     <span id="check2">➡️</span>
   </a>
@@ -185,17 +188,16 @@
 </div>
 
 <script>
-  const STEP_EXPIRY_MS = 365 * 24 * 60 * 60 * 1000; // سنة
+  const STEP_EXPIRY_MS = 365 * 24 * 60 * 60 * 1000;
   const step3Links = [
     "https://www.youtube.com/watch?v=p7Po9lUqDSo",
     "https://www.youtube.com/watch?v=J6HlSbAJY6Q"
     
   ];
 
-  const step3StorageKey = "step3States_v11258_page5959559"; // خاص بالخطوة 3
-  const stepsStateKey = "stepsState"; // خاص بالخطوتين 1 و 2
+  const step3StorageKey = "step3States_v11258_page5959559";
+  const stepsStateKey = "stepsState";
 
-  // وظيفة للتحقق من انتهاء صلاحية التخزين
   function isStateExpired(savedState) {
     if (!savedState.timestamp) return true;
     return Date.now() - savedState.timestamp > STEP_EXPIRY_MS;
@@ -205,14 +207,12 @@
     const savedState = JSON.parse(localStorage.getItem(stepsStateKey) || "{}");
     const step3State = JSON.parse(localStorage.getItem(step3StorageKey) || "{}");
 
-    // إذا انتهت صلاحية التخزين، نحذف البيانات
     if (isStateExpired(savedState)) {
       localStorage.removeItem(stepsStateKey);
       localStorage.removeItem(step3StorageKey);
       return;
     }
 
-    // تفعيل الخطوات المنفذة سابقًا
     for (let i = 1; i <= 2; i++) {
       if (savedState["step" + i]) {
         document.getElementById("step" + i).classList.add("completed");
@@ -233,7 +233,6 @@
     updateProgressBar();
   };
 
-  // حفظ حالة الخطوة 1 أو 2
   function saveStepState(step) {
     const current = JSON.parse(localStorage.getItem(stepsStateKey) || "{}");
     current["step" + step] = true;
@@ -241,13 +240,11 @@
     localStorage.setItem(stepsStateKey, JSON.stringify(current));
   }
 
-  // إكمال خطوة (1 أو 2) مع فتح الرابط، أو الخطوة 3 بدون رابط
   function completeStep(step, url = null) {
     const check = document.getElementById("check" + step);
     check.innerHTML = '<span class="loading"></span>';
 
     if (step === 3) {
-      // اختيار رابط عشوائي للخطوة 3
       const selected = step3Links[Math.floor(Math.random() * step3Links.length)];
       window.open(selected, "_blank");
     } else {
@@ -271,19 +268,28 @@
     }, 10000);
   }
 
-  // فتح رابط التحميل إذا اكتملت الخطوات
   function unlockButtons() {
     const allCompleted = [1, 2, 3].every(i => document.getElementById("step" + i).classList.contains("completed"));
     if (allCompleted) {
       document.getElementById("finalMessage").innerText = "✅ تم تنفيذ كل الخطوات بنجاح";
       document.getElementById("finalMessage").style.color = "lime";
-      const btn = document.getElementById("btnDownload");
-      btn.classList.add("active");
-      btn.innerText = "🔓 اضغط هنا لتحميل اقوي سكريبت فري فاير اخر اصدار";
+      document.getElementById("btnDownload").classList.add("active");
+
+      if (!document.getElementById("btnGuide")) {
+        const guideBtn = document.createElement("a");
+        guideBtn.id = "btnGuide";
+        guideBtn.href = "#";
+        guideBtn.className = "btn-guide active";
+        guideBtn.innerText = "❓ إذا واجهت أي مشكلة في التحميل اضغط هنا وشاهد هذا الفيديو";
+        guideBtn.onclick = function () {
+          window.open("https://youtu.be/pUzGTGt4yFE?si=AECdGwXY3bTL9Imy", "_blank");
+          return false;
+        };
+        document.querySelector(".final-buttons").appendChild(guideBtn);
+      }
     }
   }
 
-  // تحديث شريط التقدم
   function updateProgressBar() {
     let done = 0;
     for (let i = 1; i <= 3; i++) {
@@ -292,7 +298,6 @@
     document.getElementById("progressBar").style.width = (done / 3) * 100 + "%";
   }
 
-  // فتح رابط التحميل
   function goToDownload() {
     window.open("https://xdabo.com/Q1jviBh", "_blank");
   }
